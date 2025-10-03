@@ -1,0 +1,27 @@
+# --- Node.js / Frontend ---
+node_modules/
+build/
+.cache/
+.vscode/
+.env
+*.log
+
+# --- React/Vite ---
+*.local
+*.DS_Store
+
+# --- Java / Spring Boot / Backend ---
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Other unnecessary folders ---
+.cover/
+.storage/
+.idea/
+
+# --- OS files ---
+Thumbs.db
+.DS_Store

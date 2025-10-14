@@ -1,20 +1,21 @@
-async getProducts(): Promise<Product[] {
-  const res = await fetch(`${API_BASE_URL}/products`, {
-    headers: { 'Content-Type': 'application/json' },
-  });
+import { Product } from './types';
 
-  if (!res.ok) {
-    // read response text to see what backend returned
-    const errorText = await res.text();
-    console.error('Backend error response:', errorText);
-    throw new Error('Failed to fetch products');
-  }
+const API_URL = 'http://localhost:8082/api'; // your Spring Boot backend URL
 
-  const text = await res.text();
-  try {
-    return text ? JSON.parse(text) : [];
-  } catch (err) {
-    console.error('Invalid JSON from backend:', text);
-    return [];
+export const productService = {
+  getProducts: async (): Promise<Product[]> => {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('Failed to fetch products');
+    return res.json();
+  },
+
+  updateProductStatus: async (id: number | string, status: 'ACTIVE' | 'REMOVED'): Promise<Product> => {
+    const res = await fetch(`${API_URL}/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error('Failed to update product status');
+    return res.json();
   }
-}
+};

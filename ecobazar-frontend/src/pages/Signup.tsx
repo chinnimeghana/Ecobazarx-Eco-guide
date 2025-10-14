@@ -50,6 +50,8 @@ export default function Signup() {
           break;
         case 'buyer':
           navigate('/buyer-dashboard');
+        case 'admin':
+          navigate('/admin-dashboard')
           break;
         default:
           navigate('/');
@@ -116,8 +118,9 @@ export default function Signup() {
                   <SelectValue placeholder="Select account type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="buyer">Buyer - Shop eco-friendly products</SelectItem>
-                  <SelectItem value="seller">Seller - Sell sustainable products</SelectItem>
+                  <SelectItem value="buyer">Buyer</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Admin </SelectItem>
                 </SelectContent>
               </Select>
             </div>

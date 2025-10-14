@@ -10,22 +10,17 @@ import AdminDashboard from './pages/AdminDashboard';
 import SellerDashboard from './pages/SellerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
 import NotFound from './pages/NotFound';
+import ProductDashboard from './components/ProductDashboard';
+
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) => {
   const isAuthenticated = authService.isAuthenticated();
   const hasRequiredRole = requiredRole ? authService.hasRole(requiredRole) : true;
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!hasRequiredRole) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!hasRequiredRole) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
@@ -38,30 +33,32 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route 
-            path="/admin-dashboard" 
+          
+          <Route
+            path="/admin-dashboard"
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/seller-dashboard" 
+          <Route
+            path="/seller-dashboard"
             element={
               <ProtectedRoute requiredRole="seller">
                 <SellerDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/buyer-dashboard" 
+          <Route
+            path="/buyer-dashboard"
             element={
               <ProtectedRoute requiredRole="buyer">
                 <BuyerDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
+          <Route path="/products" element={<ProductDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

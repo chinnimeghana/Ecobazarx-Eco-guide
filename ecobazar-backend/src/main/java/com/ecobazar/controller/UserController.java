@@ -17,19 +17,29 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // Get all users
+    // ✅ Get all users
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // Approve a user (for sellers with pending status)
+    // ✅ Register a new user
+    @PostMapping
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+        // Default status = PENDING (or ACTIVE if you want instant approval)
+        if (user.getStatus() == null) {
+            user.setStatus(UserStatus.PENDING);
+        }
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(savedUser); // return JSON
+    }
+
+    // ✅ Approve a user (Admin action)
     @PutMapping("/{id}/approve")
     public ResponseEntity<User> approveUser(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Update status using enum
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
         return ResponseEntity.ok(user);

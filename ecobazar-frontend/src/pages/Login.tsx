@@ -24,14 +24,14 @@ export default function Login() {
       toast.success(`Welcome back, ${user.username}!`);
       
       // Navigate based on role
-      switch (user.role) {
-        case 'admin':
+      switch (user.role.toUpperCase()) {
+        case 'ADMIN':
           navigate('/admin-dashboard');
           break;
-        case 'seller':
+        case 'SELLER':
           navigate('/seller-dashboard');
           break;
-        case 'buyer':
+        case 'BUYER':
           navigate('/buyer-dashboard');
           break;
         default:

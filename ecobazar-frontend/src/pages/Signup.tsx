@@ -22,7 +22,7 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -38,20 +38,20 @@ export default function Signup() {
     try {
       const user = await authService.signup(username, email, password, role);
       toast.success(`Account created successfully! Welcome, ${user.username}!`);
-      
+
       if (user.status === 'pending') {
         toast.info('Your seller account is pending approval from admin');
       }
-      
-      // Navigate based on role
-      switch (user.role) {
-        case 'seller':
+
+      switch (user.role.toUpperCase()) {
+        case 'SELLER':
           navigate('/seller-dashboard');
           break;
-        case 'buyer':
+        case 'BUYER':
           navigate('/buyer-dashboard');
-        case 'admin':
-          navigate('/admin-dashboard')
+          break;
+        case 'ADMIN':
+          navigate('/admin-dashboard');
           break;
         default:
           navigate('/');
@@ -65,151 +65,179 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-4 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-blue-400 rounded-full opacity-20 animate-pulse delay-1000"></div>
         <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br from-blue-300 to-purple-300 rounded-full opacity-10 animate-bounce" style={{ animationDuration: '3s' }}></div>
       </div>
 
-      <Card className="w-full max-w-md relative z-10 backdrop-blur-sm bg-white/80 border-0 shadow-2xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2 text-3xl font-bold">
+      <div className="relative z-10 w-full max-w-4xl flex flex-col md:flex-row items-center gap-16">
+        <div className="hidden md:block flex-1 text-left md:-translate-x-6">
+          <div className="flex items-center space-x-2 text-4xl font-bold mb-4">
             <Leaf className="h-8 w-8 text-green-600" />
             <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               EcoBazar
             </span>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800">Join EcoBazar</CardTitle>
-          <CardDescription className="text-gray-600">
-            Create your account and start your sustainable journey
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-700 font-medium">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
-              />
+          <h2 className="text-4xl font-bold text-gray-800 mb-3">Join the sustainable shopping revolution</h2>
+          <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+            Discover eco-friendly products that help protect our planet while maintaining quality and style.
+          </p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white/70 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">50K+</div>
+              <div className="text-xs text-gray-600">Eco Products</div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
-              />
+            <div className="bg-white/70 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">100K+</div>
+              <div className="text-xs text-gray-600">CO2 Saved</div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-gray-700 font-medium">Account Type</Label>
-              <Select value={role} onValueChange={(value: 'seller' | 'buyer') => setRole(value)}>
-                <SelectTrigger className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400">
-                  <SelectValue placeholder="Select account type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="buyer">Buyer</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
-                  <SelectItem value="admin">Admin </SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="bg-white/70 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">25K+</div>
+              <div className="text-xs text-gray-600">Happy Users</div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="h-12 pr-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="h-12 pr-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
-              </div>
-            </div>
-            <Button
-              type="submit"
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold transition-all duration-300 transform hover:scale-105"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating Account...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <UserPlus className="h-4 w-4" />
-                  <span>Create Account</span>
-                </div>
-              )}
-            </Button>
-          </form>
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Already have an account?{' '}
-              <Button
-                variant="link"
-                className="p-0 h-auto font-semibold text-blue-600 hover:text-blue-700"
-                onClick={() => navigate('/login')}
-              >
-                Sign in here
-              </Button>
-            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <Card className="w-full max-w-md md:translate-x-6 backdrop-blur-sm bg-white/80 border-0 shadow-2xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex items-center justify-center space-x-2 text-3xl font-bold md:hidden">
+              <Leaf className="h-8 w-8 text-green-600" />
+              <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                EcoBazar
+              </span>
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-800">Join EcoBazar</CardTitle>
+            <CardDescription className="text-gray-600">
+              Create your account and start your sustainable journey
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-gray-700 font-medium">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-gray-700 font-medium">Account Type</Label>
+                <Select value={role} onValueChange={(value: 'seller' | 'buyer') => setRole(value)}>
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400">
+                    <SelectValue placeholder="Select account type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="buyer">Buyer</SelectItem>
+                    <SelectItem value="seller">Seller</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="h-12 pr-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    className="h-12 pr-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              <Button
+                type="submit"
+                className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold transition-all duration-300 transform hover:scale-105"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Creating Account...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <UserPlus className="h-4 w-4" />
+                    <span>Create Account</span>
+                  </div>
+                )}
+              </Button>
+            </form>
+            <div className="mt-6 text-center">
+              <p className="text-gray-600">
+                Already have an account?{' '}
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-semibold text-blue-600 hover:text-blue-700"
+                  onClick={() => navigate('/login')}
+                >
+                  Sign in here
+                </Button>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

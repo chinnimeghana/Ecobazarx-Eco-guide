@@ -13,3 +13,14 @@ export interface User {
   accountNonExpired: boolean;
   authorities: { authority: string }[];
 }
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: 'ELECTRONICS' | 'CLOTHING' | 'FOOD' | 'HOME_GARDEN' | 'PERSONAL_CARE' | 'OTHER';
+  carbonFootprint: number;
+  ecoRating: number;
+  imageUrl: string | null;
+}

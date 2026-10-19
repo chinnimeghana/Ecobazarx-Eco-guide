@@ -1,6 +1,7 @@
 import { Product } from './types';
+import { authService } from './auth';
 
-const API_URL = 'http://localhost:8082/api'; // your Spring Boot backend URL
+const API_URL = 'http://localhost:8082/api/products';
 
 export const productService = {
   getProducts: async (): Promise<Product[]> => {
@@ -9,13 +10,9 @@ export const productService = {
     return res.json();
   },
 
-  updateProductStatus: async (id: number | string, status: 'ACTIVE' | 'REMOVED'): Promise<Product> => {
-    const res = await fetch(`${API_URL}/${id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    if (!res.ok) throw new Error('Failed to update product status');
+  getProduct: async (id: number | string): Promise<Product> => {
+    const res = await fetch(`${API_URL}/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch product');
     return res.json();
-  }
+  },
 };

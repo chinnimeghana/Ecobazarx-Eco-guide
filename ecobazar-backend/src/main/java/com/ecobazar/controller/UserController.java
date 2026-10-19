@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -44,4 +45,13 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    try {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    } catch (Exception e) {
+        return ResponseEntity.status(409).body(Map.of("error", "Cannot delete this user — they may have existing orders."));
+    }
+	}
 }

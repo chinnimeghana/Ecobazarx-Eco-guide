@@ -43,8 +43,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const placeOrder = async (shippingAddress: string, paymentMethod: string) => {
     const user = authService.getCurrentUser();
-    const token = authService.getToken();
-
     if (!user) {
       throw new Error('You must be logged in to place an order');
     }
@@ -56,16 +54,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const res = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
+        headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
         body: JSON.stringify({
           buyerId: Number(user.id),
           shippingAddress,
           paymentMethod,
           items: cart.map(item => ({
-            productId: Number(item.id),
+            productId: item.id,
             quantity: item.quantityInCart,
           })),
         }),

@@ -108,6 +108,11 @@ class AuthService {
     return localStorage.getItem('token');
   }
 
+  getAuthHeaders(): Record<string, string> {
+    const token = this.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   isAuthenticated(): boolean {
     return this.getCurrentUser() !== null;
   }

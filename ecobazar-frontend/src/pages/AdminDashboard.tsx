@@ -29,11 +29,15 @@ export default function AdminDashboard() {
   const fetchAll = async () => {
     try {
       const [usersRes, productsRes] = await Promise.all([
-        fetch(`${API_BASE}/api/users`),
-        fetch(`${API_BASE}/api/products`),
+        fetch(`${API_BASE}/api/users`, { headers: { ...authService.getAuthHeaders() } }),
+        fetch(`${API_BASE}/api/products`, { headers: { ...authService.getAuthHeaders() } }),
       ]);
-      setUsers(await usersRes.json());
-      setProducts(await productsRes.json());
+
+      const usersData = usersRes.ok ? await usersRes.json() : [];
+      const productsData = productsRes.ok ? await productsRes.json() : [];
+
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setProducts(Array.isArray(productsData) ? productsData : []);
     } catch (err) {
       console.error(err);
       toast.error('Failed to load dashboard data');
@@ -53,9 +57,15 @@ export default function AdminDashboard() {
 
   const handleApprove = async (userId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/api/users/${userId}/approve`, { method: 'PUT' });
+      const res = await fetch(`${API_BASE}/api/users/${userId}/approve`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authService.getAuthHeaders(),
+        },
+      });
       if (!res.ok) throw new Error('Failed to approve');
-      toast.success('User approved');
+      toast.success('User approved successfully');
       fetchAll();
     } catch (err) {
       toast.error('Failed to approve user');
@@ -65,12 +75,17 @@ export default function AdminDashboard() {
   const handleDeleteUser = async (userId: number) => {
     if (!confirm('Delete this user? This cannot be undone.')) return;
     try {
-      const res = await fetch(`${API_BASE}/api/users/${userId}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          ...authService.getAuthHeaders(),
+        },
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Failed to delete');
       }
-      toast.success('User deleted');
+      toast.success('User deleted successfully');
       fetchAll();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to delete user');
@@ -78,21 +93,27 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteProduct = async (productId: number) => {
+    if (!confirm('Delete this product?')) return;
     try {
-      const res = await fetch(`${API_BASE}/api/products/${productId}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          ...authService.getAuthHeaders(),
+        },
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Failed to delete');
       }
-      toast.success('Product deleted');
+      toast.success('Product deleted successfully');
       fetchAll();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to delete product');
     }
   };
 
-  const buyers = users.filter(u => u.role === 'BUYER');
-  const sellers = users.filter(u => u.role === 'SELLER');
+  const buyers = users.filter(u => u.role?.toUpperCase() === 'BUYER');
+  const sellers = users.filter(u => u.role?.toUpperCase() === 'SELLER');
 
   const totalUsers = users.length;
   const activeSellers = sellers.filter(u => u.status === 'ACTIVE').length;
@@ -126,7 +147,7 @@ export default function AdminDashboard() {
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 <Badge variant={user.status === 'ACTIVE' ? 'default' : user.status === 'PENDING' ? 'secondary' : 'destructive'}>
-                  {user.status}
+                  {user.status || 'UNKNOWN'}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -152,7 +173,6 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 relative overflow-hidden">
       <div className="relative z-10">
-        {/* Updated Navbar with w-full and flex justify-between */}
         <div className="w-full bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-10">
           <div className="w-full px-6 py-4 flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -272,31 +292,37 @@ export default function AdminDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {products.map((product) => {
-                        const highCarbon = (product.carbonFootprint ?? 0) >= 8;
-                        return (
-                          <TableRow key={product.id}>
-                            <TableCell className="font-medium">{product.name}</TableCell>
-                            <TableCell>{product.category?.replace('_', ' ')}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-semibold text-green-600">{product.ecoRating}</span>
-                                <Leaf className="h-4 w-4 text-green-600" />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className={`font-semibold ${highCarbon ? 'text-red-600' : 'text-green-600'}`}>
-                                {product.carbonFootprint}kg CO2 {highCarbon && '⚠'}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => handleDeleteProduct(product.id)}>
-                                <Trash2 className="h-4 w-4 text-red-600" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {products.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center text-gray-400 py-6">No products found.</TableCell>
+                        </TableRow>
+                      ) : (
+                        products.map((product) => {
+                          const highCarbon = (product.carbonFootprint ?? 0) >= 8;
+                          return (
+                            <TableRow key={product.id}>
+                              <TableCell className="font-medium">{product.name}</TableCell>
+                              <TableCell>{product.category?.replace('_', ' ')}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-semibold text-green-600">{product.ecoRating}</span>
+                                  <Leaf className="h-4 w-4 text-green-600" />
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <span className={`font-semibold ${highCarbon ? 'text-red-600' : 'text-green-600'}`}>
+                                  {product.carbonFootprint}kg CO2 {highCarbon && '⚠'}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => handleDeleteProduct(Number(product.id))}>
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>

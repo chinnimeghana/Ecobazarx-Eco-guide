@@ -18,24 +18,24 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Get all users
+    // Get all users (Admin view)
     @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return ResponseEntity.ok(users);
     }
 
-    // ✅ Register a new user
-    @PostMapping
+    // Register a new user
+    @PostMapping("/register-external")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
-        // Default status = PENDING (or ACTIVE if you want instant approval)
         if (user.getStatus() == null) {
             user.setStatus(UserStatus.PENDING);
         }
         User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(savedUser); // return JSON
+        return ResponseEntity.ok(savedUser);
     }
 
-    // ✅ Approve a user (Admin action)
+    // Approve a user (Admin action)
     @PutMapping("/{id}/approve")
     public ResponseEntity<User> approveUser(@PathVariable Long id) {
         User user = userRepository.findById(id)
@@ -45,13 +45,14 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-    try {
-        userRepository.deleteById(id);
-        return ResponseEntity.ok().build();
-    } catch (Exception e) {
-        return ResponseEntity.status(409).body(Map.of("error", "Cannot delete this user — they may have existing orders."));
+        try {
+            userRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(Map.of("error", "Cannot delete this user — they may have existing orders."));
+        }
     }
-	}
 }

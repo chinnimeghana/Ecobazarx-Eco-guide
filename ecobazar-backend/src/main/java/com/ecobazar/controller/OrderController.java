@@ -1,6 +1,5 @@
 package com.ecobazar.controller;
 
-import com.ecobazar.dto.OrderResponseDto;
 import com.ecobazar.model.Order;
 import com.ecobazar.model.OrderItem;
 import com.ecobazar.model.Product;
@@ -13,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping({"/api/orders", "/api/seller/orders"})
@@ -32,11 +31,14 @@ public class OrderController {
     @Autowired
     private UserRepository userRepository;
 
-    // Place a new order
+    // Place a new order securely using the authenticated principal (JWT token)
     @PostMapping
-    public ResponseEntity<?> placeOrder(@RequestBody PlaceOrderRequest request) {
-        User buyer = userRepository.findById(request.getBuyerId())
-                .orElse(null);
+    public ResponseEntity<?> placeOrder(@RequestBody PlaceOrderRequest request, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized: Please log in"));
+        }
+
+        User buyer = userRepository.findByUsername(principal.getName()).orElse(null);
         if (buyer == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Buyer not found"));
         }
@@ -72,7 +74,7 @@ public class OrderController {
         return ResponseEntity.ok(savedOrder);
     }
 
-    // Get all orders for a specific buyer (Returning raw Order entities so product details serialize properly)
+    // Get all orders for a specific buyer
     @GetMapping("/buyer/{buyerId}")
     public List<Order> getOrdersByBuyer(@PathVariable Long buyerId) {
         return orderRepository.findByBuyerId(buyerId);
@@ -115,13 +117,9 @@ public class OrderController {
 
     // --- Request DTOs ---
     public static class PlaceOrderRequest {
-        private Long buyerId;
         private String shippingAddress;
         private String paymentMethod;
         private List<OrderItemRequest> items;
-
-        public Long getBuyerId() { return buyerId; }
-        public void setBuyerId(Long buyerId) { this.buyerId = buyerId; }
 
         public String getShippingAddress() { return shippingAddress; }
         public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }

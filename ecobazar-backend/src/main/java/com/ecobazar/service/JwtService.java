@@ -14,4 +14,12 @@ public class JwtService {
     public String generateToken(User user) {
         return jwtUtil.generateToken(user.getUsername());
     }
+
+    public String getUsernameFromToken(String token) {
+        return jwtUtil.getUsernameFromToken(token);
+    }
+
+    public boolean validateToken(String token) {
+        return jwtUtil.validateToken(token);
+    }
 }

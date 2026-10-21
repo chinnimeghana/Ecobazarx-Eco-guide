@@ -59,7 +59,9 @@ export default function SellerDashboard() {
     try {
       const [productData, orderRes] = await Promise.all([
         productService.getProducts(),
-        fetch('http://localhost:8082/api/orders').then(res => res.json()).catch(() => [])
+        fetch('http://localhost:8082/api/orders', {
+          headers: { ...authService.getAuthHeaders() },
+        }).then(res => res.json()).catch(() => [])
       ]);
       setProducts(productData);
       setOrders(orderRes);
@@ -113,7 +115,7 @@ export default function SellerDashboard() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
         body: JSON.stringify({
           name: newProduct.name,
           description: newProduct.description,
@@ -141,7 +143,10 @@ export default function SellerDashboard() {
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this product? This cannot be undone.')) return;
     try {
-      const res = await fetch(`http://localhost:8082/api/products/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8082/api/products/${id}`, {
+        method: 'DELETE',
+        headers: { ...authService.getAuthHeaders() },
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Failed to delete');
@@ -158,9 +163,10 @@ export default function SellerDashboard() {
     try {
       const res = await fetch(`http://localhost:8082/api/orders/${orderId}/status?status=${status}`, {
         method: 'PUT',
+        headers: { ...authService.getAuthHeaders() },
       });
       if (!res.ok) throw new Error('Failed to update status');
-      
+
       toast.success(`Order #${orderId} ${status.toLowerCase()}`);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
     } catch (err) {
@@ -183,11 +189,9 @@ export default function SellerDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 w-full">
-      {/* Full-width sticky navigation bar with increased gap between nav links */}
       <div className="w-full bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-10">
         <div className="w-full px-6 py-4 flex items-center justify-between">
-          
-          {/* Left: Menu & Logo */}
+
           <div className="flex items-center space-x-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -226,7 +230,6 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-          {/* Center Links & Search - Increased spacing from space-x-8 to space-x-12 */}
           <div className="hidden md:flex items-center space-x-12 text-sm font-medium text-gray-600">
             <button onClick={() => navigate('/')} className="hover:text-green-600 transition-colors">Home</button>
             <button onClick={() => navigate('/about')} className="hover:text-green-600 transition-colors">About</button>
@@ -243,7 +246,6 @@ export default function SellerDashboard() {
             />
           </div>
 
-          {/* Right: Logout button */}
           <div>
             <Button onClick={handleLogout} variant="outline" className="hover:bg-red-50 hover:border-red-300 hover:text-red-600">
               Logout

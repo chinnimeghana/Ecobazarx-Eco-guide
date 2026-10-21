@@ -32,7 +32,9 @@ export default function OrderHistory() {
       navigate('/login');
       return;
     }
-    fetch(`http://localhost:8082/api/orders/buyer/${user.id}`)
+    fetch(`http://localhost:8082/api/orders/buyer/${user.id}`, {
+      headers: { ...authService.getAuthHeaders() },
+    })
       .then(res => res.json())
       .then(setOrders)
       .catch(err => console.error(err))

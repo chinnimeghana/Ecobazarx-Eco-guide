@@ -1,7 +1,7 @@
 import { Product } from './types';
 import { authService } from './auth';
 
-const API_URL = 'http://localhost:8082/api/products';
+const API_URL = 'https://ecobazarx-eco-guide-production.up.railway.app/api/products';
 
 export const productService = {
   getProducts: async (): Promise<Product[]> => {

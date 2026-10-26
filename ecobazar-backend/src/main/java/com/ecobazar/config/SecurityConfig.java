@@ -1,3 +1,4 @@
+
 package com.ecobazar.config;
 
 import com.ecobazar.filter.JwtAuthenticationFilter;
@@ -29,20 +30,31 @@ public class SecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/products/**")
+                    .hasAnyRole("SELLER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/products/**")
+                    .hasAnyRole("SELLER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/products/**")
+                    .hasAnyRole("SELLER", "ADMIN")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("SELLER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("SELLER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/orders")
+                    .hasAnyRole("SELLER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/orders/**")
+                    .hasAnyRole("SELLER", "ADMIN")
                 .requestMatchers("/api/orders/**").authenticated()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         return http.build();
     }

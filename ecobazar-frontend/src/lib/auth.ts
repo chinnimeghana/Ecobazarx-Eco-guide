@@ -23,7 +23,7 @@ export interface Product {
   createdAt: string;
 }
 
-const API_BASE = 'http://localhost:8082';
+const API_BASE = 'https://ecobazarx-eco-guide-production.up.railway.app';
 
 class AuthService {
   private currentUser: User | null = null;

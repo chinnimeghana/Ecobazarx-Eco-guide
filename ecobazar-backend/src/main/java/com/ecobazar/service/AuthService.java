@@ -29,7 +29,21 @@ public class AuthService {
 
         return userRepository.save(user);
     }
+    
+    public User createAdmin(String username, String email, String password) {
+    if (userRepository.findByEmail(email).isPresent()) {
+        throw new RuntimeException("Email already registered");
+    }
 
+    User admin = new User();
+    admin.setUsername(username);
+    admin.setEmail(email);
+    admin.setPassword(passwordEncoder.encode(password));
+    admin.setRole(User.Role.ADMIN);
+    admin.setStatus(User.UserStatus.ACTIVE);
+
+    return userRepository.save(admin);
+}
     public User authenticate(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));

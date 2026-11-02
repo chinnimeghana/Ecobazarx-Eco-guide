@@ -59,7 +59,7 @@ export default function SellerDashboard() {
     try {
       const [productData, orderRes] = await Promise.all([
         productService.getProducts(),
-        fetch('http://localhost:8082/api/orders', {
+        fetch('https://ecobazarx-eco-guide-production.up.railway.app/api/orders', {
           headers: { ...authService.getAuthHeaders() },
         }).then(res => res.json()).catch(() => [])
       ]);
@@ -109,8 +109,8 @@ export default function SellerDashboard() {
     setSubmitting(true);
     try {
       const url = editingId
-        ? `http://localhost:8082/api/products/${editingId}`
-        : 'http://localhost:8082/api/products';
+        ? `https://ecobazarx-eco-guide-production.up.railway.app/api/products/${editingId}`
+        : 'https://ecobazarx-eco-guide-production.up.railway.app/api/products';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -143,7 +143,7 @@ export default function SellerDashboard() {
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this product? This cannot be undone.')) return;
     try {
-      const res = await fetch(`http://localhost:8082/api/products/${id}`, {
+      const res = await fetch(`https://ecobazarx-eco-guide-production.up.railway.app/api/products/${id}`, {
         method: 'DELETE',
         headers: { ...authService.getAuthHeaders() },
       });
@@ -161,7 +161,7 @@ export default function SellerDashboard() {
 
   const handleOrderStatusChange = async (orderId: number, status: string) => {
     try {
-      const res = await fetch(`http://localhost:8082/api/orders/${orderId}/status?status=${status}`, {
+      const res = await fetch(`https://ecobazarx-eco-guide-production.up.railway.app/api/orders/${orderId}/status?status=${status}`, {
         method: 'PUT',
         headers: { ...authService.getAuthHeaders() },
       });

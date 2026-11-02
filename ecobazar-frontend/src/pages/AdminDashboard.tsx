@@ -18,7 +18,7 @@ interface AdminUser {
   status: 'PENDING' | 'ACTIVE' | 'BLOCKED' | null;
 }
 
-const API_BASE = 'http://localhost:8082';
+const API_BASE = 'https://ecobazarx-eco-guide-production.up.railway.app';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<AdminUser[]>([]);

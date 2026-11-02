@@ -32,7 +32,7 @@ export default function OrderHistory() {
       navigate('/login');
       return;
     }
-    fetch(`http://localhost:8082/api/orders/buyer/${user.id}`, {
+    fetch(`https://ecobazarx-eco-guide-production.up.railway.app/api/orders/buyer/${user.id}`, {
       headers: { ...authService.getAuthHeaders() },
     })
       .then(res => res.json())

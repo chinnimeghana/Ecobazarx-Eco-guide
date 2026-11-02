@@ -1,3 +1,4 @@
+
 package com.ecobazar.config;
 
 import org.springframework.context.annotation.Bean;
@@ -13,15 +14,31 @@ public class CorsConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
-        // This allows your frontend at localhost:5173 to send credentials/tokens safely
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow deployed frontend and local development
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://ecobazarx-eco-guide.onrender.com",
+            "http://localhost:5173"
+        ));
+
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
+        // Allow request headers, including Authorization
         configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Allow credentials
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

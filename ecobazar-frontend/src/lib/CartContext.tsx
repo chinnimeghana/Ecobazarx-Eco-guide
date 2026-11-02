@@ -17,7 +17,7 @@ interface CartContextProps {
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
-const API_BASE = 'http://localhost:8082';
+const API_BASE = 'https://ecobazarx-eco-guide-production.up.railway.app';
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);

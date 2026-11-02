@@ -1,6 +1,6 @@
+
 package com.ecobazar;
 
-import com.ecobazar.model.User;
 import com.ecobazar.repository.UserRepository;
 import com.ecobazar.service.AuthService;
 import org.springframework.boot.CommandLineRunner;
@@ -24,15 +24,12 @@ public class AdminSetup {
                 return;
             }
 
-            if (userRepository.findByEmail(email).isEmpty()) {
-                authService.createAdmin(
-                    "Admin",
-                    email,
-                    password
-                );
-                System.out.println("Initial admin account created.");
+            if (userRepository.findByEmail(email).isPresent()) {
+                authService.resetAdminPassword(email, password);
+                System.out.println("Admin password reset successfully.");
             } else {
-                System.out.println("Admin account already exists.");
+                authService.createAdmin("Admin", email, password);
+                System.out.println("Initial admin account created.");
             }
         };
     }
